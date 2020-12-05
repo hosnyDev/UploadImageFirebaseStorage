@@ -1,4 +1,4 @@
-# UploadImageFirebasestorage
+# Upload image to firebase storage
 
 ###### Add dependencies
 ```
