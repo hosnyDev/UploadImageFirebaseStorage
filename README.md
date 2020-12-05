@@ -1,6 +1,7 @@
 # UploadImageFirebasestorage
 
-# Add dependencies
+###### Add dependencies
+```
   // Library Android-Image-Cropper
   implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
   implementation 'com.squareup.okhttp:okhttp:2.7.5'
@@ -9,19 +10,23 @@
   
   // firebase storage
   implementation 'com.google.firebase:firebase-storage:19.1.1'
+```
 
-# Add permission
+###### Add permission
+```
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
 
-# Add Image-Cropper activity in manifest file
+###### Add Image-Cropper activity in manifest file
+```
   <activity
     android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
     android:theme="@style/Base.Theme.AppCompat" />
+```
 
-#Code
-    
-#global variables
+###### global variables
+```
   private Uri imageUri = null;
   private static String ImageURL = null;
 
@@ -29,17 +34,23 @@
   private FirebaseFirestore firestore;
   private StorageReference storageReference;
   private String userID;
-  
-#in onCreate
+```
+
+###### in onCreate
+```
   firebaseAuth = FirebaseAuth.getInstance();
   firestore = FirebaseFirestore.getInstance();
   storageReference = FirebaseStorage.getInstance().getReference();
-  
-#button call method 
+```
+
+###### button call method 
+```
   checkPermission();
-  
-#to check if user allow permission or not 
-  private void checkPermission() {
+```
+
+###### to check if user allow permission or not 
+```
+ private void checkPermission() {
 
       //use permission to READ_EXTERNAL_STORAGE For Device >= Marshmallow
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -60,16 +71,20 @@
           OpenGalleryImagePicker();
       }
   }
+```
 
-#Method to open gallery
+###### Method to open gallery
+```
     private void OpenGalleryImagePicker() {
         // start picker to get image for cropping and then use the image in cropping activity
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .start(this);
     }
-    
-#On Activity result When user back Contains image
+```
+
+###### On Activity result When user back Contains image
+```
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -95,9 +110,10 @@
             }
         }
     }
+```
 
-
-#upload image to StorageReference
+###### upload image to StorageReference
+```
     private void uploadImage() {
 
         if (firebaseAuth.getCurrentUser() != null) {
@@ -151,4 +167,4 @@
             }
         }
     }
-
+```
