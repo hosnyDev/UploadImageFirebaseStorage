@@ -25,6 +25,14 @@
     android:theme="@style/Base.Theme.AppCompat" />
 ```
 
+###### Add jcenter() in repositories Setting.gradle(project setting)
+
+```
+ repositories {
+  jcenter()
+}
+```
+
 ###### global variables
 ```
   private Uri imageUri = null;
