@@ -85,39 +85,34 @@
 ```
     private void OpenGalleryImagePicker() {
         // start picker to get image for cropping and then use the image in cropping activity
-        CropImage.activity()
+        Intent intent = CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
-                .start(this);
+                .getIntent(getActivity());
+        someActivityResultLauncher.launch(intent);
     }
 ```
 
-###### On Activity result When user back Contains image
+###### Activity result When user back Contains image
 ```
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+   // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        CropImage.ActivityResult d = CropImage.getActivityResult(data);
 
+                        imageUri = d.getUri();
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                        // set image user in ImageView ;
+                        profile_image.setImageURI(imageUri);
 
-            if (resultCode == RESULT_OK) {
-
-                imageUri = result.getUri();
-
-                // set image user in ImageView ;
-                imageView.setImageURI(imageUri);
-
-                uploadImage();
-
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-
-                Exception error = result.getError();
-                Toast.makeText(UpdateProfileActivity.this, "Error : " + error, Toast.LENGTH_LONG).show();
-
-            }
-        }
-    }
+                        uploadImage();
+                    }
+                }
+            });
 ```
 
 ###### upload image to StorageReference
@@ -176,3 +171,42 @@
         }
     }
 ```
+
+###### update data in collection
+```
+    private void saveChange() {
+        if (mAuth.getCurrentUser() != null) {
+            progress_userImage.setVisibility(View.VISIBLE);
+            userID = mAuth.getCurrentUser().getUid();
+
+            final Map<String, Object> studentData = new HashMap<>();
+
+            if (ImageURL != null && ImageURL.length() > 0) {
+                studentData.put("imageUrl", ImageURL);
+                profile_image.setImageURI(imageUri);
+            }
+
+            mCollection = db.collection("users").document(userID);
+            mCollection.update(studentData)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            progress_userImage.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), "Update done", Toast.LENGTH_SHORT).show();
+                        } else {
+                            progress_userImage.setVisibility(View.GONE);
+                            try {
+                                Exception exception = task.getException();
+                                assert exception != null;
+                                throw exception;
+                            } catch (FirebaseNetworkException net) {
+                                Toast.makeText(getActivity(), "no Internet", Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                                Toast.makeText(getActivity(), "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    });
+        }
+    }
+```  
+    
